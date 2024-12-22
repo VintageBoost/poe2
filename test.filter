@@ -1,0 +1,791 @@
+#===============================================================================================================
+# PoE 2 için Mini Eşya Filtresi
+#===============================================================================================================
+# SÜRÜM:        0.0.1
+# DÜZENLEYEN:   BimmerHex
+#
+# PoE 2 için mini bir eşya filtresidir. Eşyaları gizlemekten daha çok vurgulamayı amaçlamıştır.
+
+#===============================================================================================================
+# OPERATÖRLER
+#===============================================================================================================
+
+# =
+# !
+# !=
+# <=
+# >=
+# <
+# >
+# ==
+
+#===============================================================================================================
+# GENEL KOMUTLAR
+#===============================================================================================================
+
+# Show -> Eğer bir eşya, "Show" bloğundaki koşullarla eşleşiyorsa, eşya görüntülenir.
+#   Örnek Kullanım: Show
+#            Rarity >= Rare
+
+# Hide -> Eğer bir eşya, "Hide" bloğundaki koşullarla eşleşiyorsa, eşya gizlenir. Sadece Normal filtrelerde kullanılabilir.
+#   Örnek Kullanım: Hide
+#            BaseType "Scroll of Wisdom"
+
+# AreaLevel -> Belirli bir seviyedeki alanlarda düşen eşyaları filtreler. Özellikle eşya filtrelerinin seviye kısmında yardımcı olur. Bu, yüksek seviyedeki karakterlerde seviye bölümlerini devre dışı bırakmak veya seviye alırken daha sıkı filtrelerde Bilgelik Parşömenleri ve taşları göstermek için kullanılır.
+#   Örnek Kullanım: AreaLevel < 30
+
+# BaseArmour -> Temel Zırh (Armour) ile filtreler.
+#   Örnek Kullanım: BaseArmour > 500
+
+# BaseEnergyShield -> Temel Enerji Kalkanı (Energy Shield) ile filtreler.
+#   Örnek Kullanım: BaseEnergyShield > 200
+
+# BaseEvasion -> Temel Kaçınma Değeri (Evasion Rating) ile filtreler.
+#   Örnek Kullanım: BaseEvasion >= 153
+
+# BaseType -> Temel eşya türü adı ile filtreler.
+#   Örnek Kullanım: BaseType "Thicket Bow"
+
+# Class -> Eşya sınıfı adı ile filtreler.
+#   Örnek Kullanım: Class Currency
+
+# Corrupted -> Bozulmuş veya bozulmamış eşyalarla filtreler.
+#   Örnek Kullanım: Corrupted True
+
+# CorruptedMods -> Bozulmuş modifikasyon sayısı ile filtreler.
+#   Örnek Kullanım: CorruptedMods >= 1
+
+# DropLevel -> Eşyaların düşmeye başladığı seviyeyi filtreler.
+#   Örnek Kullanım: DropLevel > 65
+
+# HasImplicitMod -> En az bir gizli modifikasyonu olan eşyalarla filtreler.
+#   Örnek Kullanım: HasImplicitMod True
+
+# ItemLevel -> Eşya seviyesine göre filtreler.
+#   Örnek Kullanım: ItemLevel >= 65
+
+# MapTier -> Haritaları Harita Seviyesi'ne göre filtreler. (TEST EDİLMEDİ!)
+#   Örnek Kullanım: MapTier >= 15
+
+# Quality -> Kaliteye göre filtreler.
+#   Örnek Kullanım: Quality > 15
+
+# Rarity -> Nadirliğe göre filtreler.
+#   Örnek Kullanım: Rarity > Magic
+
+# StackSize -> Para birimlerini yığın boyutuna göre filtreler.
+#   Örnek Kullanım: StackSize >= 5
+
+#===============================================================================================================
+# EYLEMLER
+#===============================================================================================================
+
+# PlayAlertSound -> Eşya göründüğünde yerleşik bir uyarı sesi çalar. "None" belirtilirse devre dışı bırakılır.
+# Id: 1-16 (ses seçenekleri), Volume 0-300 (varsayılan ses seviyesi 50)
+#   Örnek Kullanım: PlayAlertSound 1 100
+
+# PlayAlertSoundPositional -> PlayAlertSound'a benzer, ancak uyarı sesi eşyanın 3D konumunda çalar.
+# Id: 1-16 (ses seçenekleri), Volume 0-300 (varsayılan ses seviyesi 50)
+#   Örnek Kullanım: PlayAlertSoundPositional 16 50
+
+# CustomAlertSound -> Eşya göründüğünde belirtilen eşya uyarı ses dosyasını çalar. Birden fazla dosya belirtilebilir, bu durumda rastgele biri çalınır. PlayAlertSound ve PlayAlertSoundPositional'ı geçersiz kılar. "None" belirtilirse devre dışı bırakılır.
+# Dosya Adı / Dosya Yolu, Volume 0-300 (varsayılan ses seviyesi 100)
+#   Örnek Kullanım: CustomAlertSound "Map.mp3"
+
+# CustomAlertSoundOptional -> CustomAlertSound'a benzer, ancak belirtilen dosya yoksa bu satır göz ardı edilir ve PlayAlertSound veya PlayAlertSoundPositional'ı geçersiz kılmaz.
+# Dosya Adı / Dosya Yolu, Volume 0-300 (varsayılan ses seviyesi 100)
+#   Örnek Kullanım: CustomAlertSoundOptional "Map.mp3"
+
+# DisableDropSound -> Eşyaların yere düştüğünde çalan eşya düşüş sesini devre dışı bırakır.
+#   Örnek Kullanım: DisableDropSound
+
+# EnableDropSound -> Eşya düşüş sesini yeniden etkinleştirir.
+#   Örnek Kullanım: EnableDropSound
+
+# DisableDropSoundIfAlertSound -> DisableDropSound'a benzer, ancak yalnızca bir uyarı sesi belirtilmişse (örneğin PlayAlertSound veya CustomAlertSound ile) eşya düşüş sesi devre dışı bırakılır. Bu bayrak, DisableDropSound'dan ayrıdır.
+#   Örnek Kullanım: DisableDropSoundIfAlertSound
+
+# EnableDropSoundIfAlertSound -> Uyarı sesi belirtilmişse eşya düşüş sesini yeniden etkinleştirir.
+#   Örnek Kullanım: EnableDropSoundIfAlertSound
+
+#===============================================================================================================
+# DİĞER EYLEMLER
+#===============================================================================================================
+
+# MinimapIcon -> Minik haritada bir simge gösterir.
+# Boyut: 0 - 2
+# Renk: Red, Green, Blue, Brown, White, Yellow, Cyan, Grey, Orange, Pink, Purple
+# Şekil: Circle, Diamond, Hexagon, Square, Star, Triangle, Cross, Moon, Raindrop, Kite, Pentagon, UpsideDownHouse
+# Devre Dışı Değer: -1
+#   Örnek Kullanım: MinimapIcon 2 Cyan Diamond
+
+# PlayEffect -> Eşyaların üzerine renkli ışık ışını gösterir. Değer Temp ise, ışın sadece eşya düşerken görünür, aksi takdirde ışın sürekli olarak görünür.
+# Boyut: 0 - 2
+# Renk: Red, Green, Blue, Brown, White, Yellow, Cyan, Grey, Orange, Pink, Purple
+# Temp: Temp
+#   Örnek Kullanım: PlayEffect Red Temp
+
+# SetBackgroundColor -> Eşya etiketinin arka plan rengini ayarlar.
+# Red: 0 - 255
+# Green: 0 - 255
+# Blue: 0 - 255
+# Alpha: 0 - 255 (Varsayılan 240)
+#   Örnek Kullanım: SetBackgroundColor 255 255 255 255
+
+# SetBorderColor -> Eşya etiketinin kenarlık rengini ayarlar.
+# Red: 0 - 255
+# Green: 0 - 255
+# Blue: 0 - 255
+# Alpha: 0 - 255 (Varsayılan 255)
+#   Örnek Kullanım: SetBorderColor 255 0 0
+
+# SetFontSize -> Eşya etiketinin yazı tipi boyutunu ayarlar.
+# Size: 1 - 45
+#   Örnek Kullanım: SetFontSize 30
+
+# SetTextColor -> Eşya etiketinin metin rengini ayarlar. Ruthless filtrelerinde alfa değeri 80 veya daha yüksek olmalıdır.
+# Red: 0 - 255
+# Green: 0 - 255
+# Blue: 0 - 255
+# Alpha: 0 - 255 (Varsayılan 255)
+#   Örnek Kullanım: SetTextColor 0 0 0
+
+#--------------------------
+# Override Alanı
+#--------------------------
+
+# WAND (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Wand"
+HasExplicitMod "Beryl" or "Cobalt" or "Azure" or "Teal" or "Cerulean" or "Aqua" or "Opalescent" or "Gentian" or "Chalybeous" or "Mazarine" or "Blue" or "Zaffre" or "Apprentice's" or "Adept's" or "Scholar's" or "Professor's" or "Occultist's" or "Incanter's" or "Glyphic" or "Runic" or "Caster's" or "Conjuror's" or "Wizard's" or "Warlock's" or "Mage's" or "Archmage's" or "Lich's" or "Charged" or "Hissing" or "Bolting" or "Coursing" or "Striking" or "Smiting" or "Ionising" or "Electromancer's" or "Malignant" or "Pernicious" or "Destructive" or "Malicious" or "Ruthless" or "Frostbound" or "Deadly" or "Lethal" or "Fatal" or "Vorpal" or "Electrifying" or "Stormbound" or "of the Pupil" or "of the Student" or "of the Prodigy" or "of the Augur" or "of the Philosopher" or "of the Sage" or "of the Savant" or "of the Virtuoso" or "of the Sorcerer" or "of the Wizard" or "of Flames" or "of Immolation" or "of Inferno" or "of Ice" or "of Rime" or "of Frostbite" or "of Electricity" or "of Voltage" or "of Thunder" or "of Excitement" or "of Joy" or "of Elation" or "of Bliss" or "of Euphoria" or "of Nirvana" or "of Talent" or "of Nimbleness" or "of Expertise" or "of Sortilege" or "of Legerdemain" or "of Prestidigitation" or "of Finesse" or "of Menace" or "of Havoc" or "of Disaster" or "of Calamity" or "of Ruin" or "of Unmaking"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# ONE HANDED MACE (TAMAMLANDI)
+Show
+Rarity Rare
+Class "One Hand Mace"
+HasExplicitMod "Glinting" or "Burnished" or "Polished" or "Honed" or "Gleaming" or "Annealed" or "Razor-sharp" or "Tempered" or "Flaring" or "Frosted" or "Chilled" or "Icy" or "Frigid" or "Freezing" or "Frozen" or "Glaciated" or "Polar" or "Entombing" or "Crystalising" or "Humming" or "Buzzing" or "Snapping" or "Crackling" or "Sparking" or "Arcing" or "Shocking" or "Discharging" or "Electrocuting" or "Vapourising" or "Heavy" or "Serrated" or "Wicked" or "Vicious" or "Bloodthirsty" or "Cruel" or "Tyrannical" or "Merciless" or "Squire's" or "Journeyman's" or "Reaver's" or "Mercenary's" or "Champion's" or "Conqueror's" or "Emperor's" or "Dictator's" or "of the Brute" or "of the Wrestler" or "of the Bear" or "of the Lion" or "of the Gorilla" or "of the Goliath" or "of the Leviathan" or "of the Titan" or "of Conflict" or "of Battle" or "of War" or "of Skill" or "of Ease" or "of Mastery" or "of Renown" or "of Acclaim" or "of Fame" or "of Infamy" or "of Celebration" or "of Absorption" or "of Osmosis" or "of Infusion" or "of Enveloping" or "of Consumption" or "of Siphoning" or "of Devouring" or "of Assimilation"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# TWO HANDED MACE (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Two Hand Mace"
+HasExplicitMod "Glinting" or "Burnished" or "Polished" or "Honed" or "Gleaming" or "Annealed" or "Razor-sharp" or "Tempered" or "Flaring" or "Humming" or "Buzzing" or "Snapping" or "Crackling" or "Sparking" or "Arcing" or "Shocking" or "Discharging" or "Electrocuting" or "Vapourising" or "Heavy" or "Serrated" or "Wicked" or "Vicious" or "Bloodthirsty" or "Cruel" or "Tyrannical" or "Merciless" or "Squire's" or "Journeyman's" or "Reaver's" or "Mercenary's" or "Champion's" or "Conqueror's" or "Emperor's" or "Dictator's" or "Precise" or "Reliable" or "Focused" or "Deliberate" or "Consistent" or "Steady" or "Hunter's" or "Ranger's" or "Amazon's" or "of the Brute" or "of the Wrestler" or "of the Bear" or "of the Lion" or "of the Gorilla" or "of the Goliath" or "of the Leviathan" or "of the Titan" or "of Conflict" or "of Battle" or "of War" or "of Skill" or "of Ease" or "of Mastery" or "of Renown" or "of Acclaim" or "of Fame" or "of Infamy" or "of Celebration"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# SCEPTRE (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Sceptre"
+HasExplicitMod "Beryl" or "Cobalt" or "Azure" or "Teal" or "Cerulean" or "Aqua" or "Opalescent" or "Gentian" or "Chalybeous" or "Mazarine" or "Blue" or "Zaffre" or "Heated" or "Smouldering" or "Smoking" or "Burning" or "Flaming" or "Scorching" or "Incinerating" or "Blasting" or "Cremating" or "Humming" or "Buzzing" or "Snapping" or "Crackling" or "Sparking" or "Arcing" or "Shocking" or "Discharging" or "Electrocuting" or "Coercive" or "Agitative" or "Instigative" or "Provocative" or "Persuasive" or "Motivating" or "Inspirational" or "Empowering" or "Lord's" or "Baron's" or "Viscount's" or "Marquess'" or "Count's" or "Duke's" or "Prince's" or "King's" or "of the Brute" or "of the Wrestler" or "of the Bear" or "of the Lion" or "of the Gorilla" or "of the Goliath" or "of the Leviathan" or "of the Titan" or "of the Pupil" or "of the Student" or "of the Prodigy" or "of the Augur" or "of the Philosopher" or "of the Sage" or "of the Savant" or "of the Virtuoso" or "of the Overseer" or "of the Slavedriver" or "of the Tyrant" or "of Skill" or "of Ease" or "of Mastery" or "of Renown" or "of Talent" or "of Nimbleness" or "of Expertise" or "of Sortilege" or "of Menace" or "of Havoc" or "of Disaster" or "of Calamity" or "of Ruin" or "of Unmaking" or "of the Newt" or "of the Lizard" or "of the Flatworm" or "of the Starfish" or "of the Hydra" or "of the Troll" or "of Convalescence" or "of Recuperation" or "of Resurgence" or "of Immortality" or "of Direction" or "of Outreach" or "of Guidance" or "of Influence" or "of the Mentor" or "of the Tutor" or "of the Director" or "of the Headmaster" or "of the Administrator" or "of the Rector" or "of Excitement" or "of Joy" or "of Elation" or "of Bliss" or "of Euphoria" or "of Nirvana"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# FOCUS (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Focus"
+HasExplicitMod "Beryl" or "Cobalt" or "Azure" or "Teal" or "Cerulean" or "Aqua" or "Opalescent" or "Gentian" or "Chalybeous" or "Mazarine" or "Blue" or "Zaffre" or "Shining" or "Glimmering" or "Glittering" or "Glowing" or "Radiating" or "Pulsing" or "Blazing" or "Dazzling" or "Scintillating" or "Incandescent" or "Protective" or "Strong-Willed" or "Resolute" or "Fearless" or "Dauntless" or "Indomitable" or "Unassailable" or "Imbued" or "Serene" or "Sacred" or "Celestial" or "Heavenly" or "Angel's" or "Apprentice's" or "Adept's" or "Scholar's" or "Professor's" or "Occultist's" or "Incanter's" or "Glyphic" or "Runic" or "Charged" or "Hissing" or "Bolting" or "Coursing" or "Striking" or "Smiting" or "Ionising" or "Electromancer's" or "of the Pupil" or "of the Student" or "of the Prodigy" or "of the Augur" or "of the Philosopher" or "of the Sage" or "of the Savant" or "of the Virtuoso" or "of the Mage" or "of the Enchanter" or "of Talent" or "of Nimbleness" or "of Expertise" or "of Sortilege" or "of Legerdemain" or "of Prestidigitation" or "of the Whelpling" or "of the Salamander" or "of the Drake" or "of the Kiln" or "of the Furnace" or "of the Volcano" or "of Magma" or "of Tzteosh" or "of the Seal" or "of the Penguin" or "of the Narwhal" or "of the Yeti" or "of the Walrus" or "of the Polar Bear" or "of the Ice" or "of Haast" or "of the Cloud" or "of the Squall" or "of the Storm" or "of the Thunderhead" or "of the Tempest" or "of the Maelstrom" or "of the Lightning" or "of Ephij"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# QUIVER (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Quiver"
+HasExplicitMod "of the Mongoose" or "of the Lynx" or "of the Fox" or "of the Falcon" or "of the Panther" or "of the Leopard" or "of the Jaguar" or "of the Phantom" or "of the Archer" or "of the Fletcher" or "of Skill" or "of Ease" or "of Mastery" or "of Renown" or "of Piercing" or "of Drilling" or "of Puncturing" or "of Skewering" or "of Penetrating" or "Glinting" or "Burnished" or "Polished" or "Honed" or "Gleaming" or "Annealed" or "Razor-sharp" or "Tempered" or "Flaring" or "Frosted" or "Chilled" or "Icy" or "Frigid" or "Freezing" or "Frozen" or "Glaciated" or "Polar" or "Entombing" or "Humming" or "Buzzing" or "Snapping" or "Crackling" or "Sparking" or "Arcing" or "Shocking" or "Discharging" or "Electrocuting" or "Precise" or "Reliable" or "Focused" or "Deliberate" or "Consistent" or "Steady" or "Hunter's" or "Ranger's" or "Amazon's" or "Darting" or "Brisk" or "Quick" or "Rapid" or "Nimble" or "Acute" or "Trenchant" or "Perforating" or "Incisive" or "Lacerating" or "Impaling"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# SHIELD ()
+Show
+Rarity Rare
+Class "Shield"
+HasExplicitMod "Hale" or "Healthy" or "Sanguine" or "Stalwart" or "Stout" or "Robust" or "Rotund" or "Virile" or "Athlete's" or "Fecund" or "Vigorous" or "Steadfast" or "Unrelenting" or "Adamant" or "Warded" or "Unwavering" or "Enduring" or "Unyielding" or "Lacquered" or "Studded" or "Ribbed" or "Fortified" or "Plated" or "Carapaced" or "Encased" or "Enveloped" or "Abating" or "Unmoving" or "Shining" or "Glimmering" or "Glittering" or "Glowing" or "Radiating" or "Pulsing" or "Blazing" or "Dazzling" or "Scintillating" or "Incandescent" or "of the Brute" or "of the Wrestler" or "of the Bear" or "of the Lion" or "of the Gorilla" or "of the Goliath" or "of the Leviathan" or "of the Titan" or "of the Bushfire" or "of the Molten Core" or "of the Solar Storm" or "of the Deathless" or "of the Everlasting"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# BOW (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Bow"
+BaseType "Advanced " "Expert "
+# HasImplicitMod True
+HasExplicitMod "Glinting" or "Burnished" or "Polished" or "Honed" or "Gleaming" or "Annealed" or "Razor-sharp" or "Tempered" or "Flaring" or "Humming" or "Buzzing" or "Snapping" or "Crackling" or "Sparking" or "Arcing" or "Shocking" or "Discharging" or "Electrocuting" or "Vapourising" or "Heavy" or "Serrated" or "Wicked" or "Vicious" or "Bloodthirsty" or "Cruel" or "Tyrannical" or "Merciless" or "Squire's" or "Journeyman's" or "Reaver's" or "Mercenary's" or "Champion's" or "Conqueror's" or "Emperor's" or "Dictator's" or "Precise" or "Reliable" or "Focused" or "Deliberate" or "Consistent" or "Steady" or "Hunter's" or "Ranger's" or "Amazon's" "Valkyrie's" or "of the Mongoose" or "of the Lynx" or "of the Fox" or "of the Falcon" or "of the Panther" or "of the Leopard" or "of the Jaguar" or "of the Phantom" or "of the Sharpshooter" or "of the Marksman" or "of the Sniper" or "of Skill" or "of Ease" or "of Mastery" or "of Renown" or "of Acclaim" or "of Splintering" or "of Many"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# STAFF (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Staff"
+HasExplicitMod "Beryl" or "Cobalt" or "Azure" or "Teal" or "Cerulean" or "Aqua" or "Opalescent" or "Gentian" or "Chalybeous" or "Mazarine" or "Blue" or "Zaffre" or "Apprentice's" or "Adept's" or "Scholar's" or "Professor's" or "Occultist's" or "Incanter's" or "Glyphic" or "Runic" or "Caster's" or "Conjuror's" or "Wizard's" or "Warlock's" or "Mage's" or "Archmage's" or "Lich's" or "Charged" or "Hissing" or "Bolting" or "Coursing" or "Striking" or "Smiting" or "Ionising" or "Electromancer's" or "Deadly" or "Lethal" or "Fatal" or "Vorpal" or "Electrifying" or "Stormbound" or "of the Pupil" or "of the Student" or "of the Prodigy" or "of the Augur" or "of the Philosopher" or "of the Sage" or "of the Savant" or "of the Virtuoso" or "of the Evoker" or "of the Sorcerer" or "of Voltage" or "of Thunder" or "of Talent" or "of Nimbleness" or "of Expertise" or "of Sortilege" or "of Legerdemain" or "of Prestidigitation" or "of Finesse"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# QUARTERSTAFF (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Quarterstaff"
+HasExplicitMod "Glinting" or "Burnished" or "Polished" or "Honed" or "Gleaming" or "Annealed" or "Razor-sharp" or "Tempered" or "Flaring" or "Humming" or "Buzzing" or "Snapping" or "Crackling" or "Sparking" or "Arcing" or "Shocking" or "Discharging" or "Electrocuting" or "Vapourising" or "Heavy" or "Serrated" or "Wicked" or "Vicious" or "Bloodthirsty" or "Cruel" or "Tyrannical" or "Merciless" or "Squire's" or "Journeyman's" or "Reaver's" or "Mercenary's" or "Champion's" or "Conqueror's" or "Emperor's" or "Dictator's" or "Precise" or "Reliable" or "Focused" or "Deliberate" or "Consistent" or "Steady" or "Hunter's" or "Ranger's" or "Amazon's" or "of the Mongoose" or "of the Lynx" or "of the Fox" or "of the Falcon" or "of the Panther" or "of the Leopard" or "of the Jaguar" or "of the Phantom" or "of the Pupil" or "of the Student" or "of the Prodigy" or "of the Augur" or "of the Philosopher" or "of the Sage" or "of the Savant" or "of the Virtuoso" or "of Conflict" or "of Battle" or "of War" or "of the Parasite" or "of the Locust" or "of the Remora" or "of the Lamprey" or "of the Vampire" or "of Skill" or "of Ease" or "of Mastery" or "of Renown" or "of Acclaim" or "of Fame" or "of Infamy" or "of Celebration" or "of Impact" or "of Dazing" or "of Stunning" or "of Slamming" or "of Staggering" or "of the Concussion"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# CROSSBOW (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Crossbow"
+BaseType "Advanced " "Expert "
+HasExplicitMod "Glinting" or "Burnished" or "Polished" or "Honed" or "Gleaming" or "Annealed" or "Razor-sharp" or "Tempered" or "Flaring" or "Frosted" or "Chilled" or "Icy" or "Frigid" or "Freezing" or "Frozen" or "Glaciated" or "Polar" or "Entombing" or "Crystalising" or "Humming" or "Buzzing" or "Snapping" or "Crackling" or "Sparking" or "Arcing" or "Shocking" or "Discharging" or "Electrocuting" or "Vapourising" or "Heavy" or "Serrated" or "Wicked" or "Vicious" or "Bloodthirsty" or "Cruel" or "Tyrannical" or "Merciless" or "Squire's" or "Journeyman's" or "Reaver's" or "Mercenary's" or "Champion's" or "Conqueror's" or "Emperor's" or "Dictator's" or "Precise" or "Reliable" or "Focused" or "Deliberate" or "Consistent" or "Steady" or "Hunter's" or "Ranger's" or "Amazon's" "Valkyrie's" or "of the Brute" or "of the Wrestler" or "of the Bear" or "of the Lion" or "of the Gorilla" or "of the Goliath" or "of the Leviathan" or "of the Titan" or "of the Mongoose" or "of the Lynx" or "of the Fox" or "of the Falcon" or "of the Panther" or "of the Leopard" or "of the Jaguar" or "of the Phantom" or "of the Sharpshooter" or "of the Marksman" or "of the Sniper" or "of Skill" or "of Ease" or "of Mastery" or "of Renown" or "of Acclaim" or "of Menace" or "of Havoc" or "of Disaster" or "of Calamity" or "of Ruin" or "of Unmaking" or "of Ire" or "of Anger" or "of Rage" or "of Fury" or "of Ferocity" or "of Destruction"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# HELMET (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Helmet"
+BaseType "Advanced " "Expert "
+HasExplicitMod "Shining" or "Glimmering" or "Glittering" or "Glowing" or "Radiating" or "Pulsing" or "Blazing" or "Dazzling" or "Beryl" or "Cobalt" or "Azure" or "Teal" or "Cerulean" or "Aqua" or "Opalescent" or "Gentian" or "Chalybeous" or "Mazarine" or "Blue" or "Zaffre" or "Protective" or "Strong-Willed" or "Resolute" or "Fearless" or "Dauntless" or "Indomitable" or "Unassailable" or "of Menace" or "of Havoc" or "of Disaster" or "of Calamity" or "of Ruin" or "of Plunder" or "of Raiding" or "of Archaeology" or "of Excavation" or "of Windfall" or "of the Pupil" or "of the Student" or "of the Prodigy" or "of the Augur" or "of the Philosopher" or "of the Sage" or "of the Savant" or "of the Virtuoso" or "of the Genius" or "of the Whelpling" or "of the Salamander" or "of the Drake" or "of the Kiln" or "of the Furnace" or "of the Volcano" or "of Magma" or "of Tzteosh" or "of the Seal" or "of the Penguin" or "of the Narwhal" or "of the Yeti" or "of the Walrus" or "of the Polar Bear" or "of the Ice" or "of Haast" or "of the Cloud" or "of the Squall" or "of the Storm" or "of the Thunderhead" or "of the Tempest" or "of the Maelstrom" or "of the Lightning" or "of Ephij" or "Agile" or "Dancer's" or "Acrobat's" or "Fleet" or "Blurred" or "Phased" or "Vaporous" or "Elusory" or "Shade's" or "Ghost's" or "Spectre's" or "Wraith's" or "Phantasm's" or "Nightmare's" or "Mirage's" or "Hale" or "Healthy" or "Sanguine" or "Stalwart" or "Stout" or "Robust" or "Rotund" or "Virile" or "Athlete's" or "Fecund" or "Lacquered" or "Studded" or "Ribbed" or "Fortified" or "Plated" or "Carapaced" or "Encased" or "Enveloped" or "Reinforced" or "Layered" or "Lobstered" or "Buttressed" or "Thickened" or "Girded" or "Impregnable" or "of the Brute" or "of the Wrestler" or "of the Bear" or "of the Lion" or "of the Gorilla" or "of the Goliath" or "of the Leviathan" or "of the Titan" or "of the Taskmaster" or "of the Despot" or 
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# BODY ARMOUR (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Body Armour"
+BaseType "Advanced " "Expert "
+HasExplicitMod "Shining" or "Glimmering" or "Glittering" or "Glowing" or "Radiating" or "Pulsing" or "Blazing" or "Dazzling" or "Scintillating" or "Incandescent" or "Resplendent" or "Lady's" or "Baronness'" or "Viscountess'" or "Marchioness'" or "Countess'" or "Duchess'" or "Princess'" or "Queen's" or "Protective" or "Strong-Willed" or "Resolute" or "Fearless" or "Dauntless" or "Indomitable" or "Unassailable" or "of the Pupil" or "of the Student" or "of the Prodigy" or "of the Augur" or "of the Philosopher" or "of the Sage" or "of the Savant" or "of the Virtuoso" or "of the Whelpling" or "of the Salamander" or "of the Drake" or "of the Kiln" or "of the Furnace" or "of the Volcano" or "of Magma" or "of Tzteosh" or "of the Seal" or "of the Penguin" or "of the Narwhal" or "of the Yeti" or "of the Walrus" or "of the Polar Bear" or "of the Ice" or "of Haast" or "of the Cloud" or "of the Squall" or "of the Storm" or "of the Thunderhead" or "of the Tempest" or "of the Maelstrom" or "of the Lightning" or "of Ephij" or "Agile" or "Dancer's" or "Acrobat's" or "Fleet" or "Blurred" or "Phased" or "Vaporous" or "Elusory" or "Adroit" or "Lissome" or "Fugitive" or "Shade's" or "Ghost's" or "Spectre's" or "Wraith's" or "Phantasm's" or "Nightmare's" or "Mirage's" or "Hale" or "Healthy" or "Sanguine" or "Stalwart" or "Stout" or "Robust" or "Rotund" or "Virile" or "Athlete's" or "Fecund" or "Vigorous" or "Rapturous" or "Prime" or "of the Mongoose" or "of the Lynx" or "of the Fox" or "of the Falcon" or "of the Panther" or "of the Leopard" or "of the Jaguar" or "of the Phantom" or "Scrapper's" or "Brawler's" or "Fencer's" or "Gladiator's" or "Duelist's" or "Hero's" or "Legend's" or "of Thick Skin" or "of Reinforced Skin" or "of Stone Skin" or "of Iron Skin" or "of Steel Skin" or "of Granite Skin" or "of Platinum Skin" or "of Adamantite Skin" or "of Corundum Skin" or "of Obsidian Skin" or 
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# GLOVES (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Gloves"
+BaseType "Advanced " "Expert "
+HasExplicitMod "Glinting" or "Burnished" or "Polished" or "Honed" or "Gleaming" or "Annealed" or "Razor-sharp" or "Tempered" or "Flaring" or "Heated" or "Smouldering" or "Smoking" or "Burning" or "Flaming" or "Scorching" or "Incinerating" or "Blasting" or "Cremating" or "Hale" or "Healthy" or "Sanguine" or "Stalwart" or "Stout" or "Robust" or "Rotund" or "Virile" or "Athlete's" or "of the Worthy" or "of the Apt" or "of the Talented" or "of the Skilled" or "of the Proficient" or "of Skill" or "of Ease" or "of Mastery" or "of Renown" or "Lacquered" or "Studded" or "Ribbed" or "Fortified" or "Plated" or "Carapaced" or "Encased" or "Reinforced" or "Layered" or "Lobstered" or "Buttressed" or "Thickened" or "Girded" or "Impregnable" or "Scrapper's" or "Brawler's" or "Fencer's" or "Gladiator's" or "Duelist's" or "Hero's" or "Legend's" or "of Combat" or "of Dueling" or "of the Whelpling" or "of the Salamander" or "of the Drake" or "of the Kiln" or "of the Furnace" or "of the Volcano" or "of Magma" or "of Tzteosh" or "of the Seal" or "of the Penguin" or "of the Narwhal" or "of the Yeti" or "of the Walrus" or "of the Polar Bear" or "of the Ice" or "of Haast" or "of the Cloud" or "of the Squall" or "of the Storm" or "of the Thunderhead" or "of the Tempest" or "of the Maelstrom" or "of the Lightning" or "of Ephij" or "Beryl" or "Cobalt" or "Azure" or "Teal" or "Cerulean" or "Aqua" or "Opalescent" or "Gentian" or "Chalybeous" or "Mazarine" or "Blue" or "Zaffre" or "Shining" or "Glimmering" or "Glittering" or "Glowing" or "Radiating" or "Pulsing" or "Blazing" or "of the Pupil" or "of the Student" or "of the Prodigy" or "of the Augur" or "of the Philosopher" or "of the Sage" or "of the Savant" or "of the Virtuoso" or "Infixed" or "Ingrained" or "Instilled" or "Infused" or "Inculcated" or "Interpolated" or "Inspired"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# BOOTS (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Boots"
+BaseType "Advanced " "Expert "
+HasExplicitMod "Shining" or "Glimmering" or "Glittering" or "Glowing" or "Radiating" or "Pulsing" or "Blazing" or "Beryl" or "Cobalt" or "Azure" or "Teal" or "Cerulean" or "Aqua" or "Opalescent" or "Gentian" or "Chalybeous" or "Mazarine" or "Blue" or "Zaffre" or "Runner's" or "Sprinter's" or "Stallion's" or "Gazelle's" or "Cheetah's" or "Hellion's" or "of Plunder" or "of Raiding" or "of Archaeology" or "of Excavation" or "of Windfall" or "of the Pupil" or "of the Student" or "of the Prodigy" or "of the Augur" or "of the Philosopher" or "of the Sage" or "of the Savant" or "of the Virtuoso" or "of the Whelpling" or "of the Salamander" or "of the Drake" or "of the Kiln" or "of the Furnace" or "of the Volcano" or "of Magma" or "of Tzteosh" or "of the Seal" or "of the Penguin" or "of the Narwhal" or "of the Yeti" or "of the Walrus" or "of the Polar Bear" or "of the Ice" or "of Haast" or "of the Cloud" or "of the Squall" or "of the Storm" or "of the Thunderhead" or "of the Tempest" or "of the Maelstrom" or "of the Lightning" or "of Ephij" or "Lacquered" or "Studded" or "Ribbed" or "Fortified" or "Plated" or "Carapaced" or "Encased" or "Agile" or "Dancer's" or "Acrobat's" or "Fleet" or "Blurred" or "Phased" or "Vaporous" or "Scrapper's" or "Brawler's" or "Fencer's" or "Gladiator's" or "Duelist's" or "Hero's" or "Legend's" or "of Thick Skin" or "of Reinforced Skin" or "of Stone Skin" or "of Iron Skin" or "of Steel Skin" or "of Granite Skin" or "of Platinum Skin" or "of Adamantite Skin" or "of Corundum Skin" or "of Obsidian Skin" or "of Titanium Skin" or "Reinforced" or "Layered" or "Lobstered" or "Buttressed" or "Thickened" or "Girded" or "Impregnable"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# AMULET (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Amulet"
+HasExplicitMod "Beryl" or "Cobalt" or "Azure" or "Teal" or "Cerulean" or "Aqua" or "Opalescent" or "Gentian" or "Chalybeous" or "Mazarine" or "Blue" or "Zaffre" or "Ultramarine" or "Shining" or "Glimmering" or "Glittering" or "Glowing" or "Radiating" or "Pulsing" or "Blazing" or "Dazzling" or "Scintillating" or "Incandescent" or "of the Pupil" or "of the Student" or "of the Prodigy" or "of the Augur" or "of the Philosopher" or "of the Sage" or "of the Savant" or "of the Virtuoso" or "of the Brute" or "of the Wrestler" or "of the Bear" or "of the Lion" or "of the Gorilla" or "of the Goliath" or "of the Leviathan" or "of the Titan" or "Lady's" or "Baronness'" or "Viscountess'" or "Marchioness'" or "Countess'" or "of the Crystal" or "of the Prism" or "of the Kaleidoscope" or "of Variegation" or "of the Rainbow" or "of the Span" or "of the Whelpling" or "of the Salamander" or "of the Drake" or "of the Kiln" or "of the Furnace" or "of the Volcano" or "of Magma" or "of Tzteosh" or "of the Seal" or "of the Penguin" or "of the Narwhal" or "of the Yeti" or "of the Walrus" or "of the Polar Bear" or "of the Ice" or "of Haast" or "of the Cloud" or "of the Squall" or "of the Storm" or "of the Thunderhead" or "of the Tempest" or "of the Maelstrom" or "of the Lightning" or "of Ephij" or "Protective" or "Strong-Willed" or "Resolute" or "Fearless" or "Dauntless" or "Indomitable" or "Unassailable" or "of Talent" or "of Nimbleness" or "of Expertise" or "of Sortilege" or "of Legerdemain" or "of Plunder" or "of Raiding" or "of Archaeology" or "of Excavation" or "of Windfall" or "of Excitement" or "of Joy" or "of Elation" or "of Bliss" or "of Euphoria" or "of Nirvana" or "Hale" or "Healthy" or "Sanguine" or "Stalwart" or "Stout" or "Robust" or "Rotund" or "Virile" or "Athlete's" or "of the Archer" or "of the Fletcher" or "of the Sharpshooter" or "of the Clouds" or "of the Sky" or "of the Meteor" or "of the Comet" or "of the Heavens" or "of the Galaxy" or "of the Universe" or "of the Multiverse" or "of the Infinite" or "of the Mongoose" or "of the Lynx" or "of the Fox" or "of the Falcon" or "of the Panther" or "of the Leopard" or "of the Jaguar" or "of the Phantom" or "of the Taskmaster" or "of the Despot" or "of the Overseer" or "of Reinforced" or "Reinforced" or "Layered" or "Lobstered" or "Buttressed" or "Thickened" or "Girded" or "Impregnable" or "of Reprieve" or "of Solace" or "of Tranquility" or "of Serenity" or "of Zen"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# RING (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Ring"
+HasExplicitMod "Beryl" or "Cobalt" or "Azure" or "Teal" or "Cerulean" or "Aqua" or "Opalescent" or "Gentian" or "Chalybeous" or "Mazarine" or "Blue" or "Zaffre" or "Ultramarine" or "of the Crystal" or "of the Prism" or "of the Kaleidoscope" or "of Variegation" or "of the Rainbow" or "of the Whelpling" or "of the Salamander" or "of the Drake" or "of the Kiln" or "of the Furnace" or "of the Volcano" or "of Magma" or "of Tzteosh" or "of the Seal" or "of the Penguin" or "of the Narwhal" or "of the Yeti" or "of the Walrus" or "of the Polar Bear" or "of the Ice" or "of Haast" or "of the Cloud" or "of the Squall" or "of the Storm" or "of the Thunderhead" or "of the Tempest" or "of the Maelstrom" or "of the Lightning" or "of Ephij" or "Charged" or "Hissing" or "Bolting" or "Coursing" or "Striking" or "Smiting" or "of Plunder" or "of Raiding" or "of Archaeology" or "of Excavation" or "of Windfall" or "of the Pupil" or "of the Student" or "of the Prodigy" or "of the Augur" or "of the Philosopher" or "of the Sage" or "of the Savant" or "of the Virtuoso" or "Glinting" or "Burnished" or "Polished" or "Honed" or "Gleaming" or "Annealed" or "Razor-sharp" or "Tempered" or "Flaring" or "Heated" or "Smouldering" or "Smoking" or "Burning" or "Flaming" or "Scorching" or "Incinerating" or "Blasting" or "Cremating" or "Hale" or "Healthy" or "Sanguine" or "Stalwart" or "Stout" or "Robust" or "Rotund" or "Virile" or "of the Thirsty" or "of the Parched" or "of the Arid" or "of the Parasite" or "of the Locust" or "of the Remora" or "Searing" or "Sizzling" or "Blistering" or "Cauterising" or "Volcanic" or "Magmatic" or "Precise" or "Reliable" or "Focused" or "Deliberate" or "Consistent" or "Steady" or "Hunter's" or "Ranger's" or "of the Newt" or "of the Lizard" or "of the Flatworm" or "of the Starfish" or "of the Hydra" or "of the Troll" or "of Convalescence"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# BELT (TAMAMLANDI)
+Show
+Rarity Rare
+Class "Belt"
+HasExplicitMod "Beryl" or "Cobalt" or "Azure" or "Teal" or "Cerulean" or "Aqua" or "Opalescent" or "Gentian" or "Chalybeous" or "Mazarine" or "Blue" or "Zaffre" or "Hale" or "Healthy" or "Sanguine" or "Stalwart" or "Stout" or "Robust" or "Rotund" or "Virile" or "Athlete's" or "Fecund" or "Lacquered" or "Studded" or "Ribbed" or "Fortified" or "Plated" or "Carapaced" or "Encased" or "Enveloped" or "Abating" or "Unmoving" or "of the Brute" or "of the Wrestler" or "of the Bear" or "of the Lion" or "of the Gorilla" or "of the Goliath" or "of the Leviathan" or "of the Titan" or "of the Gods" or "of the Whelpling" or "of the Salamander" or "of the Drake" or "of the Kiln" or "of the Furnace" or "of the Volcano" or "of Magma" or "of Tzteosh" or "of the Seal" or "of the Penguin" or "of the Narwhal" or "of the Yeti" or "of the Walrus" or "of the Polar Bear" or "of the Ice" or "of Haast" or "of the Cloud" or "of the Squall" or "of the Storm" or "of the Thunderhead" or "of the Tempest" or "of the Maelstrom" or "of the Lightning" or "of Ephij"
+SetTextColor 255 200 255 255
+SetBorderColor 255 200 255 255
+PlayEffect Red Temp
+MinimapIcon 1 Red Circle
+SetFontSize 45
+
+# WANDLARI GÖSTER (MAGIC)
+Show
+Rarity Magic
+BaseType "Attuned Wand" "Siphoning Wand" "Galvanic Wand"
+HasExplicitMod "of Electricity" or "of Voltage" or "of Thunder"
+SetTextColor 100 200 255 255
+SetBorderColor 100 200 255 255
+PlayEffect Blue Temp
+MinimapIcon 1 Blue Star
+SetFontSize 40
+
+# WAND BASELERİ GÖSTER (NORMAL)
+Show
+Rarity Normal
+BaseType "Attuned Wand" "Siphoning Wand" "Galvanic Wand"
+SetTextColor 0 200 255 255
+SetBorderColor 0 200 255 255
+PlayEffect White Temp
+MinimapIcon 1 White Star
+SetFontSize 40
+
+# BELT BASELERİ GÖSTER (NORMAL)
+Show
+Rarity Normal
+Class "Belt"
+BaseType "Heavy Belt" "Utility Belt"
+SetTextColor 0 200 255 255
+SetBorderColor 0 200 255 255
+PlayEffect White Temp
+MinimapIcon 1 White Star
+SetFontSize 40
+
+# RING BASELERİ GÖSTER (NORMAL)
+Show
+Rarity Normal
+Class "Ring"
+BaseType "Sapphire Ring"
+SetTextColor 0 200 255 255
+SetBorderColor 0 200 255 255
+PlayEffect White Temp
+MinimapIcon 1 White Star
+SetFontSize 40
+
+# AMULET BASELERİ GÖSTER (NORMAL)
+Show
+Rarity Normal
+Class "Amulet"
+BaseType "Stellar Amulet"
+SetTextColor 0 200 255 255
+SetBorderColor 0 200 255 255
+PlayEffect White Temp
+MinimapIcon 1 White Star
+SetFontSize 40
+
+# 500 ve üstü Altınları Göster
+# Show
+# BaseType == "Gold"
+# StackSize >= 50
+# SetTextColor 255 255 255
+# SetBorderColor 255 255 255
+# PlayEffect Orange Temp
+
+# # 1000 ve üstü Altınları Göster
+# Show
+# BaseType == "Gold"
+# StackSize >= 100
+# SetTextColor 255 255 255
+# SetBorderColor 255 255 255
+# PlayEffect Yellow Temp
+
+# 2500 ve üstü Altınları Göster
+Show
+BaseType == "Gold"
+StackSize >= 5000
+SetTextColor 255 255 0
+SetBorderColor 255 255 255
+PlayEffect Green Temp
+
+Hide
+BaseType == "Gold"
+
+#--------------------------
+# WAYSTONES
+#--------------------------
+Show
+BaseType "Waystone"
+Rarity <= Rare
+WaystoneTier >= 13
+SetBackgroundColor 0 0 0 255
+SetTextColor 255 255 255
+SetBorderColor 255 255 255
+MinimapIcon 1 White Square
+PlayEffect White
+PlayAlertSound 6 300
+SetFontSize 40
+
+#--------------------------
+# UNCUT SKILL - SUPPORT GEM
+#--------------------------
+# 19 level
+Show
+ItemLevel >= 19
+BaseType "Uncut Skill Gem"
+SetTextColor 20 240 240
+SetBorderColor 20 240 240
+MinimapIcon 1 Cyan Triangle
+PlayEffect Cyan
+PlayAlertSound 2 300
+SetFontSize 40
+
+# Uncut Support Gemler
+Show
+ItemLevel == 3
+BaseType "Uncut Support Gem"
+SetTextColor 20 240 240
+SetBorderColor 20 240 240
+MinimapIcon 1 Cyan Triangle
+PlayEffect Cyan
+PlayAlertSound 2 300
+SetFontSize 35
+
+# Uncut Spirit Gemler
+Show
+ItemLevel >= 19
+BaseType "Uncut Spirit Gem"
+SetTextColor 20 240 240
+SetBorderColor 20 240 240
+MinimapIcon 1 Cyan Triangle
+PlayEffect Cyan
+PlayAlertSound 2 300
+SetFontSize 40
+
+
+# 18 level ve altı
+Hide
+ItemLevel <= 18
+BaseType "Uncut Skill Gem"
+
+Hide
+ItemLevel <= 18
+BaseType "Uncut Spirit Gem"
+
+Hide
+ItemLevel <= 2
+BaseType "Uncut Support Gem"
+#--------------------------
+# SOUL CORE - TIMELESS
+#--------------------------
+Show 
+BaseType "Soul Core" "Timeless"
+SetTextColor 0 240 190
+SetBorderColor 0 240 190
+SetFontSize 45
+MinimapIcon 0 Cyan Diamond
+PlayAlertSound 2 300
+PlayEffect Cyan
+
+#--------------------------
+# BREACH RINGS
+#--------------------------
+Show 
+Rarity Rare
+BaseType == "Breach Ring"
+SetTextColor 0 240 190
+SetBorderColor 0 240 190
+MinimapIcon 1 Cyan Diamond
+PlayEffect Cyan
+PlayAlertSound 2 300
+SetFontSize 40
+
+Show 
+Rarity <= Magic
+BaseType == "Breach Ring"
+SetTextColor 0 240 190
+MinimapIcon 2 Cyan Diamond
+PlayEffect Cyan Temp
+SetFontSize 35
+
+#--------------------------
+# SANCTUM RELICS
+#--------------------------
+Show 
+Class "Relic"
+SetTextColor 0 240 190
+SetBorderColor 0 240 190
+SetFontSize 40
+MinimapIcon 1 Cyan Diamond
+PlayEffect Cyan
+PlayAlertSound 2 300
+
+#--------------------------
+# JEWEL
+#--------------------------
+Show
+Class "Jewel"
+Rarity <= Rare
+SetTextColor 0 240 190
+SetBorderColor 0 240 190
+SetFontSize 40
+MinimapIcon 1 Cyan Diamond
+PlayEffect Cyan
+PlayAlertSound 2 300
+
+#--------------------------
+# SCROLL OF WISDOM - GİZLE
+#--------------------------
+Hide
+Rarity <= Magic
+BaseType "Scroll of Wisdom"
+AreaLevel >= 70
+
+#--------------------------
+# CURRENCY
+#--------------------------
+# Divine Orb Style
+Show
+Class "Currency"
+BaseType "Mirror" "Divine" "Perfect Jeweller's Orb"
+SetFontSize 45
+SetTextColor 255 0 0 255
+SetBorderColor 255 0 0 255
+SetBackgroundColor 255 255 255 255
+PlayAlertSound 6 300
+PlayEffect Red
+MinimapIcon 0 Red Star
+
+Show
+BaseType == "Distilled Isolation" "Distilled Suffering"
+SetFontSize 45
+SetTextColor 255 0 0 255
+SetBorderColor 255 0 0 255
+SetBackgroundColor 255 255 255 255
+PlayAlertSound 6 300
+PlayEffect Red
+MinimapIcon 0 Red Star
+
+# Currency Tier A
+Show
+Class "Currency"
+BaseType "Orb of Annulment" "Orb of Chance" "Greater Jeweller's Orb" "Distilled Fear" "Distilled Despair"
+SetTextColor 255 0 0 255
+SetBorderColor 255 0 0 255
+SetBackgroundColor 255 255 255 255
+PlayAlertSound 1 300
+PlayEffect White
+MinimapIcon 1 Yellow Circle
+SetFontSize 45
+
+# Currency Tier B
+Show
+Class "Currency"
+BaseType "Exotic Coinage" "Exalted Orb"
+SetTextColor 255 0 0 255
+SetBorderColor 255 0 0 255
+SetBackgroundColor 255 255 255 255
+PlayAlertSound 2 300
+PlayEffect Yellow
+MinimapIcon 1 Yellow Circle
+SetFontSize 45
+
+Show
+BaseType "Gold Key" "Silver Key" "Bronze Key"
+SetTextColor 255 207 132
+SetBorderColor 255 207 132
+SetBackgroundColor 76 51 12
+PlayAlertSound 2 300
+PlayEffect White
+MinimapIcon 2 White Circle
+SetFontSize 45
+
+# Currency Tier B
+Show
+Class "Currency"
+BaseType "Gemcutter's Prism" "Vaal Orb" "Chaos Orb" "Lesser Jeweller's Orb" "Regal Orb" "Artificer's Orb" "Glassblower's Bauble" "Orb of Alchemy"
+SetTextColor 255 207 132
+SetBorderColor 255 207 132
+SetBackgroundColor 76 51 12
+PlayAlertSound 2 300
+PlayEffect White
+MinimapIcon 2 White Circle
+SetFontSize 45
+
+Show
+Class "Currency"
+BaseType "Simulacrum Splinter" "Breach Splinter" " Artifact" 
+SetTextColor 255 207 132
+SetBorderColor 255 207 132
+SetBackgroundColor 76 51 12
+PlayAlertSound 2 100
+PlayEffect White Temp
+MinimapIcon 1 White Kite
+SetFontSize 45
+
+Show
+Class "Omen"
+BaseType "Omen of"
+SetTextColor 255 207 132
+SetBorderColor 255 207 132
+SetBackgroundColor 76 51 12
+PlayAlertSound 2 300
+PlayEffect White
+MinimapIcon 2 White Circle
+SetFontSize 45
+
+Show
+Class "Currency"
+BaseType "Distilled" "Catalyst" "Essence of"
+SetTextColor 255 207 132
+SetBorderColor 255 207 132
+SetBackgroundColor 76 51 12
+PlayAlertSound 2 300
+PlayEffect White
+MinimapIcon 2 White Circle
+SetFontSize 45
+
+# Currency Tier C
+Show
+Class "Currency"
+AreaLevel >= 70
+BaseType "Arcanist's Etcher" "Armourer's Scrap" "Blacksmith's Whetstone" "Orb of Augmentation" "Orb of Transmutation" "Regal Shard" "Chance Shard"
+SetBackgroundColor 0 0 0 255
+SetBorderColor 255 207 132
+SetTextColor 255 255 255
+SetFontSize 35
+
+Show
+Class "Currency"
+BaseType "Arcanist's Etcher" "Armourer's Scrap" "Blacksmith's Whetstone" "Orb of Augmentation" "Orb of Transmutation" "Regal Shard" "Chance Shard"
+SetBackgroundColor 0 0 0 255
+SetBorderColor 255 207 132
+SetTextColor 255 255 132
+MinimapIcon 2 Grey Circle
+SetFontSize 45
+
+Show
+Class "Currency"
+BaseType "Scroll of Wisdom" "Shard"
+
+# Bilinmeyen currency
+Show
+Class "Currency"
+SetTextColor 255 207 132
+SetBorderColor 255 207 132
+SetBackgroundColor 76 51 12
+PlayAlertSound 2 300
+PlayEffect Pink
+MinimapIcon 1 White Circle
+
+Show
+Class "Pinnacle Keys"
+SetTextColor 255 207 255
+SetBorderColor 255 207 255
+SetBackgroundColor 65 20 80
+PlayAlertSound 2 300
+PlayEffect White
+MinimapIcon 1 Yellow Square
+SetFontSize 40
+
+Show
+BaseType "Simulacrum" " Tablet" "Breachstone" "Cowardly Fate" "Deadly Fate" "Victorious Fate" "Expedition Logbook" "Test of"
+SetTextColor 255 207 255
+SetBorderColor 255 207 255
+SetBackgroundColor 65 20 80
+PlayAlertSound 2 300
+PlayEffect Purple
+MinimapIcon 1 Purple Square
+SetFontSize 45
+
+Show
+BaseType "Barya" "Ultimatum"
+SetTextColor 255 207 255
+SetBorderColor 255 207 255
+SetBackgroundColor 65 20 80
+PlayAlertSound 2 300
+PlayEffect Grey
+MinimapIcon 1 Grey Square
+SetFontSize 40
+
+#--------------------------
+# TÜM LEGENDARYLERİ GÖSTER
+#--------------------------
+Show
+Rarity "Unique"
+SetTextColor 175 96 37 255
+SetBorderColor 175 96 37 255
+SetBackgroundColor 53 13 13 255
+PlayAlertSound 3 300
+PlayEffect Brown
+MinimapIcon 1 Brown Star
+SetFontSize 40
+
+#--------------------------
+# IRON RUNE GÖSTER
+#--------------------------
+Show 
+BaseType "Iron Rune"
+SetTextColor 0 240 190
+PlayEffect Cyan Temp
+
+#--------------------------
+# GİZLENEN EŞYALAR
+#--------------------------
+
+Show
+Rarity Rare
+Class "Helmets" "Body Armour" "Gloves" "Boots" "Shields" "Quiver" "Focus" "Mace" "Staff" "Quarter" "Bow" "Crossbow" "Wand" "Sceptre" "Belt" "Ring" "Amulet"
+SetTextColor 255 255 0 255
+SetBorderColor 255 255 255 255
+SetBackgroundColor 0 0 0 255
+SetFontSize 38
+
+# Silah ve Kıyafetler Gizle
+Hide
+Class "Helmets" "Body Armour" "Gloves" "Boots" "Shields" "Quiver" "Focus" "Mace" "Staff" "Quarter" "Bow" "Crossbow" "Wand" "Sceptre" "Belt" "Ring" "Amulet"
+
+# Flask Gizle (70 area level üstünde quality olmayan flaskları gizle)
+Hide
+Quality = 0
+AreaLevel > 70
+Rarity <= Magic
+Class "Flasks"
+
+# Rune ve Charm Gizle
+Hide
+BaseType " Rune" " Charm"
+
+# Waystone Tier 13 altını gizle
+Hide
+BaseType "Waystone"
+WaystoneTier < 13
